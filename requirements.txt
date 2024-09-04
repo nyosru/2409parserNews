@@ -4,3 +4,5 @@ beautifulsoup4==4.11.1
 Werkzeug==2.0.3
 sqlalchemy>=1.4,<2.0
 pymysql
+idna
+punycode

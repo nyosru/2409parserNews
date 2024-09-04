@@ -7,6 +7,9 @@ WORKDIR /app
 # Копируем файлы проекта
 COPY . .
 
+# Открываем порт, на котором будет работать приложение
+#EXPOSE 5000
+
 # Устанавливаем зависимости
 RUN pip install --no-cache-dir -r requirements.txt
 

@@ -1,26 +1,17 @@
-from sqlalchemy import create_engine, Table, MetaData, insert
+from sqlalchemy import create_engine, Table, MetaData, insert, select
 from sqlalchemy.orm import sessionmaker
-# from sqlalchemy import create_engine, Table, MetaData
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import SQLAlchemyError
+from datetime import datetime
 import os
 
 # Получаем строку подключения из переменной окружения
 DATABASE_URI = os.getenv('DATABASE_URI')
 
-# Настройка подключения к базе данных (замените на ваши данные)
-#DATABASE_URI = 'mysql+pymysql://username:password@localhost/dbname'
-#DATABASE_URI = 'mysql+pymysql://root:as321S@localhost/2309livewire'
-#DATABASE_URI = 'mysql+pymysql://root:as1S@db_mysql/2309livewire'
-
-# Данные для подключения к базе данных
-#DATABASE_URI = 'mysql+pymysql://root:as@db_mysql:3306/2309livewire'
-
 engine = create_engine(DATABASE_URI)
 Session = sessionmaker(bind=engine)
 metadata = MetaData(bind=engine)
 st_news = Table('st_news', metadata, autoload=True)
-
-
+st_news_photos = Table('st_news_photos', metadata, autoload=True)
 
 def check_db_connection():
     """Проверяет подключение к базе данных"""
@@ -31,7 +22,6 @@ def check_db_connection():
     except Exception as e:
         print(f"Error connecting to the database: {e}")
         return False
-
 
 def get_db_session():
     """Возвращает новый сеанс подключения к базе данных"""
@@ -58,20 +48,54 @@ def insert_news(news_list):
     finally:
         session.close()
 
-def add_news_to_db(news_data):
-    """
-    Функция для добавления данных в таблицу st_news.
-
-    :param news_data: Словарь с данными новости
-    """
-    session = Session()
+def add_news_to_db(news_item):
+    """Добавляет новость в таблицу st_news, проверяя на уникальность по полю source"""
+    session = get_db_session()
+    result = {
+        'status': False,
+        'message': ''
+    }
+    
     try:
-        # Вставка данных в таблицу
-        insert_stmt = insert(st_news).values(news_data)
-        session.execute(insert_stmt)
+        # Проверка, существует ли новость с таким же source
+        existing_news = session.execute(select(st_news).where(st_news.c.source == news_item['source'])).first()
+
+        if existing_news:
+            result['message'] = 'News with the same source already exists in the database.'
+            return result  # Новость уже существует в базе данных
+
+        # Текущее время для полей created_at и updated_at
+        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        # Добавляем необходимые поля
+        news_item['created_at'] = current_time
+        news_item['updated_at'] = current_time
+
+        # Вставляем новость в таблицу
+        session.execute(st_news.insert().values(news_item))
         session.commit()
-    except Exception as e:
-        print(f"Ошибка при добавлении данных: {e}")
+        result['status'] = True
+        result['message'] = 'News inserted successfully.'
+
+        # Если у новости есть изображения, добавляем их в таблицу st_news_photos
+        if 'image' in news_item and news_item['image']:
+            st_news_id = session.execute(select(st_news.c.id).where(st_news.c.source == news_item['source'])).scalar()
+            if st_news_id:
+                session.execute(
+                    st_news_photos.insert().values(
+                        st_news_id=st_news_id,
+                        image_path=news_item['image'],
+                        created_at=current_time,
+                        updated_at=current_time
+                    )
+                )
+                session.commit()
+
+    except SQLAlchemyError as e:
+        result['message'] = f"Error adding news to the database: {e}"
         session.rollback()
+
     finally:
         session.close()
+
+    return result
