@@ -1,7 +1,7 @@
 import requests
 from fn import replace_month_with_number, parse_date
 from bs4 import BeautifulSoup
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urljoin
 from db_utils import add_news_to_db
 import idna
 
@@ -123,3 +123,24 @@ def scrape_website(url, show_html=False):
         result["html"] = html  # Добавляем HTML-код, если параметр show_html=True
 
     return result
+
+def parse_catalogs(html, domain):
+    """Парсит каталоги новостей (ссылки и названия) с главной страницы"""
+    soup = BeautifulSoup(html, 'html.parser')
+    catalogs = []
+
+    if domain == 'тюменскаяобласть.рф':
+        # Предполагается, что каталоги находятся внутри определённого блока
+        ss = soup.find('div', class_='section-filter__categories')
+        for title_tag in ss.find_all('a', class_='section-filter__category'):  # Укажите правильный класс блока каталогов
+            #title_tag = catalog.find('a', class_='section-filter__category')  # Укажите правильный класс для заголовка
+            link = title_tag['href'] if title_tag and 'href' in title_tag.attrs else ""
+            title = title_tag.get_text(strip=True) if title_tag else ""
+
+            catalogs.append({
+                'title': title,
+                'link_full': urljoin(f'https://{domain}', link),
+                'link': link
+            })
+
+    return catalogs

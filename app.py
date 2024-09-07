@@ -3,7 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
 from db_utils import check_db_connection, add_news_to_db
-from scrapper import parse_news, scrape_website, parse_news, parse_news_article
+from scrapper import parse_news, scrape_website, parse_news, parse_news_article, parse_catalogs
 
 app = Flask(__name__)
 
@@ -83,6 +83,41 @@ def parse_item():
         result["html"] = html  # Добавляем полный HTML-код, если параметр show_html=True
 
     return jsonify(result)
+
+
+
+@app.route('/catalogs', methods=['GET'])
+def parse_catalogs_route():
+    """Парсит каталоги новостей с главной страницы сайта"""
+    url = request.args.get('url')
+    show_html = request.args.get('show_html', 'false').lower() == 'true'
+
+    if not url:
+        return jsonify({"error": "No URL provided"}), 400
+
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": str(e)})
+
+    domain = urlparse(url).netloc
+    html = response.text
+    catalogs = parse_catalogs(html, domain)
+
+    result = {
+        "url": url,
+        "catalogs": catalogs
+    }
+
+    if show_html:
+        result["html"] = html  # Добавляем полный HTML-код, если параметр show_html=True
+
+    return jsonify(result)
+
+
+
+
 
 
 if __name__ == '__main__':
