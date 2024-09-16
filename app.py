@@ -37,7 +37,8 @@ def parse_catalogs_route():
     chrome_options.add_argument('--disable-dev-shm-usage')
 
     try:
-        driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
+        # driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
+        driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=chrome_options)
         driver.get(url)
         html = driver.page_source
         driver.quit()
