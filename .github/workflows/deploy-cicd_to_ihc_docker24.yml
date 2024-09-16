@@ -30,13 +30,15 @@ jobs:
             git reset --hard ${{ env.GIT_BRANCH }}
 
 
-#      - name: "update composer migration"
-#        uses: appleboy/ssh-action@master
-#        with:
-#          host: ${{ env.VPS_IP }}
-#          username: ${{ env.VPS_USERNAME }}
-#          key: ${{ secrets.DEPLOY_KEY }}
-#          script: |
+      - name: "restart composer"
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.VPS_IP }}
+          username: ${{ env.VPS_USERNAME }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: |
+            docker-compose up --build --force-recreate ${{ env.CONTAINER }}
+
 #            docker exec ${{ env.CONTAINER }} composer i --no-dev
 #            docker exec ${{ env.CONTAINER }} php artisan migrate
 #            docker exec ${{ env.CONTAINER }} php artisan view:clear
