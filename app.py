@@ -1,9 +1,14 @@
 from flask import Flask, request, jsonify
-import requests
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urlparse
 from db_utils import check_db_connection, add_news_to_db
-from scrapper import parse_news, scrape_website, parse_news, parse_news_article, parse_catalogs
+from scrapper import parse_news_article, parse_catalogs
+import os
+from webdriver_manager.chrome import ChromeDriverManager
 
 app = Flask(__name__)
 
@@ -21,8 +26,6 @@ def check_db():
     }
     return jsonify(response)
 
-
-
 @app.route('/news_list', methods=['GET'])
 def scrape():
     """Парсит новости с указанного URL и добавляет их в базу данных"""
@@ -33,27 +36,9 @@ def scrape():
         return jsonify({"error": "No URL provided"}), 400
 
     # Парсинг новостей
-    result = scrape_website(url, show_html=show_html)
-
-    # Списки для хранения результатов
-#     added_news = []
-#     not_added_news = []
-
-    # Обрабатываем новости
-#     for news_item in result.get('news', []):
-#         add_result = add_news_to_db(news_item)
-#         if add_result['status']:
-#             added_news.append(news_item['title'])
-#         else:
-#             not_added_news.append(news_item['title'])
-
-    # Добавляем списки в результат
-#     result['added_news'] = added_news
-#     result['not_added_news'] = not_added_news
+    result = scrape_website_selenium(url, show_html=show_html)
 
     return jsonify(result)
-
-
 
 @app.route('/parse_item', methods=['GET'])
 def parse_item():
@@ -64,15 +49,13 @@ def parse_item():
     if not url:
         return jsonify({"error": "No URL provided"}), 400
 
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-    except requests.exceptions.RequestException as e:
-        return jsonify({"error": str(e)})
+    # Используем Selenium для загрузки страницы
+    html = get_html_selenium(url)
+    if 'error' in html:
+        return jsonify(html)
 
     domain = urlparse(url).netloc
-    html = response.text
-    news_item = parse_news_article(html,domain)
+    news_item = parse_news_article(html['html'], domain)
 
     result = {
         "url": url,
@@ -80,11 +63,9 @@ def parse_item():
     }
 
     if show_html:
-        result["html"] = html  # Добавляем полный HTML-код, если параметр show_html=True
+        result["html"] = html['html']  # Добавляем полный HTML-код, если параметр show_html=True
 
     return jsonify(result)
-
-
 
 @app.route('/catalogs', methods=['GET'])
 def parse_catalogs_route():
@@ -95,15 +76,13 @@ def parse_catalogs_route():
     if not url:
         return jsonify({"error": "No URL provided"}), 400
 
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-    except requests.exceptions.RequestException as e:
-        return jsonify({"error": str(e)})
+    # Используем Selenium для загрузки страницы
+    html = get_html_selenium(url)
+    if 'error' in html:
+        return jsonify(html)
 
     domain = urlparse(url).netloc
-    html = response.text
-    catalogs = parse_catalogs(html, domain)
+    catalogs = parse_catalogs(html['html'], domain)
 
     result = {
         "url": url,
@@ -111,13 +90,26 @@ def parse_catalogs_route():
     }
 
     if show_html:
-        result["html"] = html  # Добавляем полный HTML-код, если параметр show_html=True
+        result["html"] = html['html']  # Добавляем полный HTML-код, если параметр show_html=True
 
     return jsonify(result)
 
+def get_html_selenium(url):
+    """Использует Selenium для получения HTML-кода страницы"""
+    chrome_options = Options()
+    chrome_options.add_argument('--headless')  # Запуск в фоновом режиме без открытия окна браузера
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--disable-dev-shm-usage')
 
-
-
+    try:
+        # Используем ChromeDriverManager для автоматической установки драйвера
+        driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
+        driver.get(url)
+        html = driver.page_source
+        driver.quit()
+        return {'html': html}
+    except Exception as e:
+        return {'error': str(e)}
 
 
 if __name__ == '__main__':

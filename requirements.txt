@@ -6,3 +6,5 @@ sqlalchemy>=1.4,<2.0
 pymysql
 idna
 punycode
+selenium
+webdriver-manager
