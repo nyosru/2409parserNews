@@ -43,7 +43,8 @@ jobs:
           key: ${{ secrets.DEPLOY_KEY }}
           script: |
             cd /home/docker
-            docker-compose up --build --force-recreate ${{ env.CONTAINER }}
+            # docker-compose up --build --force-recreate ${{ env.CONTAINER }}
+            docker-compose up --force-recreate ${{ env.CONTAINER }}
 
 #            docker exec ${{ env.CONTAINER }} composer i --no-dev
 #            docker exec ${{ env.CONTAINER }} php artisan migrate
