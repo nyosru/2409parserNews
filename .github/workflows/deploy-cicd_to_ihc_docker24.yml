@@ -51,6 +51,7 @@ jobs:
           key: ${{ secrets.DEPLOY_KEY }}
           script: |
             cd /home/docker
+            docker-compose down --rmi all --volumes
             docker-compose up --build -d --force-recreate ${{ env.CONTAINER }}
 #            docker-compose up --build --force-recreate ${{ env.CONTAINER }}
 
