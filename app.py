@@ -26,6 +26,8 @@ def check_db():
     return jsonify(response)
 
 
+
+
 @app.route('/catalogs', methods=['GET'])
 def parse_catalogs_route():
     """Парсит каталоги новостей с главной страницы сайта, используя Selenium"""
