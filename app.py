@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from urllib.parse import urlparse
-from scrapper import parse_news, scrape_website, parse_news_article, parse_catalogs
+from scrapper import parse_news_tyumen_oblast, parse_news, scrape_website, parse_news_article, parse_catalogs
 import requests
 
 # from selenium import webdriver
@@ -73,7 +73,13 @@ def scrape():
         return jsonify({"error": "No URL provided"}), 400
 
     # Парсинг новостей
-    result = scrape_website_selenium(url, show_html=show_html)
+    response = requests.get(url, verify=False)
+    res = parse_news_tyumen_oblast(response.content)
+
+    result = {'url':url, 'items':res}
+
+    if show_html:
+        result["html"] = response.content  # Добавляем полный HTML-код, если параметр show_html=True
 
     return jsonify(result)
 
@@ -84,16 +90,18 @@ def parse_item():
     url = request.args.get('url')
     show_html = request.args.get('show_html', 'false').lower() == 'true'
 
-    if not url:
-        return jsonify({"error": "No URL provided"}), 400
+    # if not url:
+    #     return jsonify({"error": "No URL provided"}), 400
+    #
+    # # Используем Selenium для загрузки страницы
+    # html = get_html_selenium(url)
+    # if 'error' in html:
+    #     return jsonify(html)
 
-    # Используем Selenium для загрузки страницы
-    html = get_html_selenium(url)
-    if 'error' in html:
-        return jsonify(html)
-
+    response = requests.get(url, verify=False)
+    # res = parse_news_tyumen_oblast(response.content)
     domain = urlparse(url).netloc
-    news_item = parse_news_article(html['html'], domain)
+    news_item = parse_news_article(response.content, domain)
 
     result = {
         "url": url,
@@ -101,7 +109,7 @@ def parse_item():
     }
 
     if show_html:
-        result["html"] = html['html']  # Добавляем полный HTML-код, если параметр show_html=True
+        result["html"] = response.content # Добавляем полный HTML-код, если параметр show_html=True
 
     return jsonify(result)
 

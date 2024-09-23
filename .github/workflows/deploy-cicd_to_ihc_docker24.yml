@@ -53,6 +53,7 @@ jobs:
             cd /home/docker
             docker-compose down --rmi all --volumes
             docker-compose up --build -d --force-recreate ${{ env.CONTAINER }}
+            docker-compose up -d
 #            docker-compose up --build --force-recreate ${{ env.CONTAINER }}
 
 #            docker exec ${{ env.CONTAINER }} composer i --no-dev
