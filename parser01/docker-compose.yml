@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  parser:
+    build: .
+    container_name: parser
+    volumes:
+      - './src:/app/src'
+    ports:
+      - '8000:8000'
+    command: ['python3', '/app/src/main.py']

@@ -1,15 +1,19 @@
 from flask import Flask, request, jsonify
 from urllib.parse import urlparse
 from scrapper import parse_news, scrape_website, parse_news_article, parse_catalogs
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
+import requests
+
+# from selenium import webdriver
+# from selenium.webdriver.chrome.options import Options
+# from webdriver_manager.chrome import ChromeDriverManager
 
 app = Flask(__name__)
+
 
 @app.route('/', methods=['GET'])
 def index():
     return jsonify({'status': 'ok'})
+
 
 @app.route('/check_db', methods=['GET', 'POST'])
 def check_db():
@@ -21,6 +25,7 @@ def check_db():
     }
     return jsonify(response)
 
+
 @app.route('/catalogs', methods=['GET'])
 def parse_catalogs_route():
     """Парсит каталоги новостей с главной страницы сайта, используя Selenium"""
@@ -30,22 +35,17 @@ def parse_catalogs_route():
     if not url:
         return jsonify({"error": "No URL provided"}), 400
 
-    # Используем Selenium для получения HTML
-    chrome_options = Options()
-    chrome_options.add_argument('--headless')  # Запуск в фоновом режиме без открытия окна браузера
-    chrome_options.add_argument('--no-sandbox')
-    chrome_options.add_argument('--disable-dev-shm-usage')
-
     try:
-        # driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
-        # driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=chrome_options)
-        driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
+        response = requests.get(url, verify=False)
+        html = response.content
 
-        driver.get(url)
-        html = driver.page_source
-        driver.quit()
+
     except Exception as e:
-        return jsonify({"error": str(e)})
+        return jsonify({
+            "error": str(e),
+            "line": 50,
+            "step": 3
+        })
 
     domain = urlparse(url).netloc
     catalogs = parse_catalogs(html, domain)
@@ -61,9 +61,6 @@ def parse_catalogs_route():
     return jsonify(result)
 
 
-
-
-
 @app.route('/news_list', methods=['GET'])
 def scrape():
     """Парсит новости с указанного URL и добавляет их в базу данных"""
@@ -77,6 +74,7 @@ def scrape():
     result = scrape_website_selenium(url, show_html=show_html)
 
     return jsonify(result)
+
 
 @app.route('/parse_item', methods=['GET'])
 def parse_item():
