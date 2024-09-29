@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from urllib.parse import urlparse
-from scrapper import parse_news_tyumen_oblast, parse_news, scrape_website, parse_news_article, parse_catalogs
+from scrapper import parse_news_tyumen_oblast, parse_news, scrape_website, parse_news_article, parse_catalogs, get_html
 import requests
 
 # from selenium import webdriver
@@ -72,15 +72,40 @@ def scrape():
     if not url:
         return jsonify({"error": "No URL provided"}), 400
 
-    # Парсинг новостей
+    # Парсинг новостей в зависимости от домена
     response = requests.get(url, verify=False)
-    res = parse_news_tyumen_oblast(response.content)
 
-    result = {'url':url, 'items':res}
+    if '72.ru' in url:
+        res = parse_news(response.content, '72.ru')
+    else:
+        if 'vsluh.ru' in url:
+            res = parse_news(response.content, 'vsluh.ru')
+        else:
+            res = parse_news_tyumen_oblast(response.content)
 
-    if show_html:
-        result["html"] = response.content  # Добавляем полный HTML-код, если параметр show_html=True
+    result = {
+        'url': url,
+        'items': res,
+        'html_length': len(response.content)  # Добавляем длину HTML-кода
+    }
 
+    # if show_html:
+    # result["html"] = response.content  # Добавляем полный HTML-код, если параметр show_html=True
+
+    return jsonify(result)
+
+
+
+
+@app.route('/get_html', methods=['GET'])
+def get_html_app():
+    url = request.args.get('url')
+    html = get_html(url)
+
+    result = {
+        "url": url,
+        "html": html
+    }
     return jsonify(result)
 
 
