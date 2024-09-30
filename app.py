@@ -109,35 +109,74 @@ def get_html_app():
     return jsonify(result)
 
 
-@app.route('/parse_item', methods=['GET'])
+@app.route('/parse_item', methods=['GET', 'POST'])
 def parse_item():
     """Парсит одиночную новость с указанного URL"""
-    url = request.args.get('url')
+
+    # Получаем все параметры запроса (GET и POST)
+    # all_get_params = request.args.to_dict()  # Все GET параметры
+    # all_post_params = request.form.to_dict()  # Все POST параметры
+    # all_params = request.values.to_dict()  # Объединяет GET и POST параметры
+
+    # Получаем отдельно url и html_in для примера
+    # url = request.values.get('url')
+    url = request.form.get('url')
+    # html_in = request.values.get('html')
+    html_in = request.form.get('html')
+
+    # result = {
+    #     # "get_params": all_get_params,
+    #     # "post_params": all_post_params,
+    #     # "all_params": all_params,  # Все параметры (GET и POST)
+    #     "url": url,
+    #     "html_in": html_in
+    # }
+    #
+    # return jsonify(result)
+
+    # html_in1 = 1
+
+    # if request.method == 'POST':
+    #     url = request.args.get('url')
+    #     # url = request.form.get('url')
+    #     html_in = request.form.get('html')
+    #     html_in1 = request.args.get('html')
+    # else:  # Для GET-запросов
+    #     url = request.args.get('url')
+    #     html_in = request.args.get('html')
+    #
+    # result = {
+    #     "url": url,
+    #     "html_in": html_in,
+    #     "html_in1": html_in1
+    # }
+
+    # return jsonify(result)
+
     show_html = request.args.get('show_html', 'false').lower() == 'true'
 
-    # if not url:
-    #     return jsonify({"error": "No URL provided"}), 400
-    #
-    # # Используем Selenium для загрузки страницы
-    # html = get_html_selenium(url)
-    # if 'error' in html:
-    #     return jsonify(html)
-
-    response = requests.get(url, verify=False)
+    # response = requests.get(url, verify=False)
     # res = parse_news_tyumen_oblast(response.content)
     domain = urlparse(url).netloc
-    news_item = parse_news_article(response.content, domain)
+    #  news_item = parse_news_article(response.content, domain)
 
-    result = {
-        "url": url,
-        "news_item": news_item
-    }
+    if html_in:  # Если html_in не пустой
+        news_item = parse_news_article(html_in, domain)
+        result = {
+            "news_item": news_item
+        }
+    else:  # Если html_in пустой, парсим новость с указанного URL
+        response = requests.get(url, verify=False)
+        news_item = parse_news_article(response.content, domain)
+        result = {
+            "url": url,
+            "news_item": news_item
+        }
 
-    if show_html:
-        result["html"] = response.content # Добавляем полный HTML-код, если параметр show_html=True
+        if show_html:
+            result["html"] = response.content  # Добавляем полный HTML-код, если параметр show_html=True
 
     return jsonify(result)
-
 
 def get_html_selenium(url):
     """Использует Selenium для получения HTML-кода страницы"""

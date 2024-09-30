@@ -51,6 +51,7 @@ def get_html(url):
 
     return html
 
+
 def parse_news_tyumen_oblast(html):
     """Парсит новости из HTML-страницы для домена тюменскаяобласть.рф"""
     soup = BeautifulSoup(html, 'html.parser')
@@ -83,10 +84,12 @@ def parse_news_tyumen_oblast(html):
         })
 
     return news_items
+
+
 from bs4 import BeautifulSoup
 
-def parse_news_72_ru(html):
 
+def parse_news_72_ru(html):
     """Парсит новости из HTML-страницы для домена тюменскаяобласть.рф"""
     soup = BeautifulSoup(html, 'html.parser')
     news_items = []
@@ -118,7 +121,6 @@ def parse_news_72_ru(html):
         })
 
     return news_items
-
 
 
 def parse_news_vsluh_ru(html):
@@ -156,6 +158,9 @@ def parse_news_vsluh_ru(html):
 
 
 def parse_news_article(html, domain):
+    # return domain
+    # return html
+
     """Парсит отдельную новость из HTML-страницы"""
     soup = BeautifulSoup(html, 'html.parser')
 
@@ -163,32 +168,59 @@ def parse_news_article(html, domain):
 
         # Извлекаем заголовок
         title = soup.find('h1', {'itemprop': 'headline'}).get_text(strip=True)
+        # return title
 
-        # Извлекаем описание
-        description = soup.find('p', {'itemprop': 'description'}).get_text(strip=True)
+        try:
+            # Извлекаем описание
+            description = soup.find('p', {'itemprop': 'description'}).get_text(strip=True)
+        except:
+            description = 'ошибка'
 
-        # Извлекаем дату публикации
-        date_published = soup.find('time', {'itemprop': 'datePublished'}).get_text(strip=True)
+        try:
+            # Извлекаем дату публикации
+            date_published = soup.find('time', {'itemprop': 'datePublished'}).get_text(strip=True)
+        except:
+            description = 'ошибка2'
 
-        # Извлекаем количество просмотров
-        views = soup.find('span', class_='item_VmtHQ').get_text(strip=True)
+        try:
+            # Извлекаем количество просмотров
+            views = soup.find('span', class_='item_VmtHQ').get_text(strip=True)
+        except:
+            description = 'ошибка3'
 
-        # Извлекаем текст статьи
-        article_body = soup.find('div', {'itemprop': 'articleBody'})
-        paragraphs = article_body.find_all('p')
-        article_text = '\n'.join([p.get_text(strip=True) for p in paragraphs])
+        try:
+            # Извлекаем текст статьи
+            article_body = soup.find('div', {'itemprop': 'articleBody'})
+        except:
+            description = 'ошибка4'
 
-        # Извлекаем количество комментариев
-        comments = soup.find('span', class_='counter_sZXgN').get_text(strip=True)
+        try:
+            paragraphs = article_body.find_all('p')
+        except:
+            description = 'ошибка5'
+
+        try:
+            article_text = '\n'.join([p.get_text(strip=True) for p in paragraphs])
+        except:
+            description = 'ошибка6'
+
+        try:
+            # Извлекаем количество комментариев
+            comments = soup.find('span', class_='counter_sZXgN').get_text(strip=True)
+        except:
+            description = 'ошибка7'
 
         # Возвращаем словарь с данными
-        return {
+        news_item = {
+            'ss': 1,
             'title': title,
-            'description': description,
-            'date_published': date_published,
-            'views': views,
-            'article_text': article_text,
-            'comments': comments
+            'content': article_text,
+            'dop': {
+                'description': description,
+                'views': views,
+                'published_datetime': date_published,
+                'comments_kolvo': comments
+            },
         }
 
 
@@ -197,13 +229,13 @@ def parse_news_article(html, domain):
         title_tag = b.find('h1', class_='h2')
         category_tag = b.find('a', class_='prop-list__item colored')
         date_tag = b.find('time', class_='prop-list__item.detail-card-date')
-        #image_tag = b.find('div', class_='detail-card__image-wrapper img')
+        # image_tag = b.find('div', class_='detail-card__image-wrapper img')
         content_tag = b.find('div', class_='detail-card__text')
 
         title = title_tag.get_text(strip=True) if title_tag else ""
         category = category_tag.get_text(strip=True) if category_tag else ""
         date = date_tag.get_text(strip=True) if date_tag else ""
-        #image = image_tag.find('img')['src'] if image_tag else ""
+        # image = image_tag.find('img')['src'] if image_tag else ""
         content = content_tag.get_text(strip=True) if content_tag else ""
 
         # Извлечение всех изображений внутри блока с классом "detail-card__entity"
@@ -216,14 +248,14 @@ def parse_news_article(html, domain):
             'title': title,
             'category': category,
             'date': parsed_date,
-            #'image': image,
+            # 'image': image,
             'image': images,
             'content': content,
         }
 
-        return news_item
+    return news_item
 
-    return False
+    # return False
 
 
 def parse_news(html, domain):
