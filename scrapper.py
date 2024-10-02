@@ -10,6 +10,31 @@ from selenium.webdriver.chrome.options import Options
 import time
 import random
 
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager  # Импорт webdriver-manager для Chrome
+from selenium.webdriver.chrome.options import Options
+
+# Функция для настройки драйвера
+def setup_driver():
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")  # Добавить опцию headless, если нужно
+    chrome_options.add_argument("--no-sandbox")  # Полезно для контейнеров
+
+    # Используем ChromeDriverManager для управления драйвером
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+    return driver
+
+
+# Основной код для работы с Selenium
+def scrape_website(url):
+    driver = setup_driver()  # Инициализируем драйвер через setup_driver
+    try:
+        driver.get(url)
+        print(f"Title of the page is: {driver.title}")
+        # Ваш код для скрапинга здесь
+    finally:
+        driver.quit()
 
 def random_delay():
     time.sleep(random.uniform(1, 3))

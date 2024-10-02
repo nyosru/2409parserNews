@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from urllib.parse import urlparse
-from scrapper import parse_news_tyumen_oblast, parse_news, scrape_website, parse_news_article, parse_catalogs, get_html
+from scrapper import parse_news_tyumen_oblast, parse_news, scrape_website, parse_news_article, parse_catalogs, get_html, \
+    setup_driver
 import requests
 
 # from selenium import webdriver
@@ -94,6 +95,27 @@ def scrape():
 
     return jsonify(result)
 
+
+
+
+@app.route('/get_html2', methods=['GET'])
+def get_html_app2():
+    url = request.args.get('url')
+    # html = get_html(url)
+    #
+    # result = {
+    #     "url": url,
+    #     "html": html
+    # }
+    # return jsonify(result)
+    driver = setup_driver()  # Инициализируем драйвер через setup_driver
+    try:
+        driver.get(url)
+        print(f"Title of the page is: {driver.title}")
+        # Ваш код для скрапинга здесь
+
+    finally:
+        driver.quit()
 
 
 

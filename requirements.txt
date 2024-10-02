@@ -9,3 +9,4 @@ idna~=3.4
 punycode
 
 selenium~=4.25.0
+webdriver-manager>=4.0.0
