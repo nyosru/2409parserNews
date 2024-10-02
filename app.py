@@ -95,9 +95,6 @@ def scrape():
 
     return jsonify(result)
 
-
-
-
 @app.route('/get_html2', methods=['GET'])
 def get_html_app2():
     url = request.args.get('url')
