@@ -42,7 +42,8 @@ def random_delay():
 
 def get_html(url):
     # Путь к chromedriver (замените на ваш путь к драйверу)
-    chromedriver_path = '/path/to/chromedriver'
+    #chromedriver_path = '/path/to/chromedriver'
+    chromedriver_path = '/usr/local/bin/chromedriver'
 
     # Настройки браузера
     chrome_options = Options()
