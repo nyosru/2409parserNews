@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify
 from urllib.parse import urlparse
-from scrapper import parse_news_tyumen_oblast, parse_news, scrape_website, parse_news_article, parse_catalogs, get_html, \
-    setup_driver
+from scrapper import parse_news_tyumen_oblast, parse_news, scrape_website, parse_news_article, parse_catalogs, get_html
 import requests
 
 # from selenium import webdriver
@@ -16,15 +15,15 @@ def index():
     return jsonify({'status': 'ok'})
 
 
-@app.route('/check_db', methods=['GET', 'POST'])
-def check_db():
-    """Проверяет подключение к базе данных"""
-    connect_db = check_db_connection()
-    response = {
-        'connect_db': connect_db,
-        'message': "Подключение к базе данных успешно." if connect_db else "Не удалось подключиться к базе данных."
-    }
-    return jsonify(response)
+# @app.route('/check_db', methods=['GET', 'POST'])
+# def check_db():
+#     """Проверяет подключение к базе данных"""
+#     connect_db = check_db_connection()
+#     response = {
+#         'connect_db': connect_db,
+#         'message': "Подключение к базе данных успешно." if connect_db else "Не удалось подключиться к базе данных."
+#     }
+#     return jsonify(response)
 
 
 
@@ -95,24 +94,24 @@ def scrape():
 
     return jsonify(result)
 
-@app.route('/get_html2', methods=['GET'])
-def get_html_app2():
-    url = request.args.get('url')
-    # html = get_html(url)
-    #
-    # result = {
-    #     "url": url,
-    #     "html": html
-    # }
-    # return jsonify(result)
-    driver = setup_driver()  # Инициализируем драйвер через setup_driver
-    try:
-        driver.get(url)
-        print(f"Title of the page is: {driver.title}")
-        # Ваш код для скрапинга здесь
-
-    finally:
-        driver.quit()
+# @app.route('/get_html2', methods=['GET'])
+# def get_html_app2():
+#     url = request.args.get('url')
+#     # html = get_html(url)
+#     #
+#     # result = {
+#     #     "url": url,
+#     #     "html": html
+#     # }
+#     # return jsonify(result)
+#     driver = setup_driver()  # Инициализируем драйвер через setup_driver
+#     try:
+#         driver.get(url)
+#         print(f"Title of the page is: {driver.title}")
+#         # Ваш код для скрапинга здесь
+#
+#     finally:
+#         driver.quit()
 
 
 
@@ -202,22 +201,22 @@ def parse_item():
 
     return jsonify(result)
 
-def get_html_selenium(url):
-    """Использует Selenium для получения HTML-кода страницы"""
-    chrome_options = Options()
-    chrome_options.add_argument('--headless')  # Запуск в фоновом режиме без открытия окна браузера
-    chrome_options.add_argument('--no-sandbox')
-    chrome_options.add_argument('--disable-dev-shm-usage')
-
-    try:
-        # Используем ChromeDriverManager для автоматической установки драйвера
-        driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
-        driver.get(url)
-        html = driver.page_source
-        driver.quit()
-        return {'html': html}
-    except Exception as e:
-        return {'error': str(e)}
+# def get_html_selenium(url):
+#     """Использует Selenium для получения HTML-кода страницы"""
+#     chrome_options = Options()
+#     chrome_options.add_argument('--headless')  # Запуск в фоновом режиме без открытия окна браузера
+#     chrome_options.add_argument('--no-sandbox')
+#     chrome_options.add_argument('--disable-dev-shm-usage')
+#
+#     try:
+#         # Используем ChromeDriverManager для автоматической установки драйвера
+#         driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
+#         driver.get(url)
+#         html = driver.page_source
+#         driver.quit()
+#         return {'html': html}
+#     except Exception as e:
+#         return {'error': str(e)}
 
 
 if __name__ == '__main__':
