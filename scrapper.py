@@ -4,7 +4,6 @@ from requests.exceptions import RequestException
 from fn import replace_month_with_number, parse_date
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse, urljoin
-#from db_utils import add_news_to_db
 import idna
 import time
 import random
