@@ -52,6 +52,7 @@ jobs:
           script: |
             cd /home/docker
             docker-compose up -d --force-recreate ${{ env.CONTAINER }}
+            docker-compose up -d
 #            make d
   #            docker-compose down --rmi all --volumes
 #            docker-compose up --build -d --force-recreate ${{ env.CONTAINER }}
