@@ -119,12 +119,17 @@ def get_html_app2():
 @app.route('/get_html', methods=['GET'])
 def get_html_app():
     url = request.args.get('url')
-    html = get_html(url)
+    result = get_html(url)
 
-    result = {
-        "url": url,
-        "html": html
-    }
+    # if result["status"]:
+    #     print("HTML страницы получен успешно")
+    # else:
+    #     print(f"Ошибка: {result['html']}")
+    #
+    # result = {
+    #     "url": url,
+    #     "html": html
+    # }
     return jsonify(result)
 
 

@@ -1,81 +1,39 @@
 import requests
+from requests.exceptions import RequestException
+
 from fn import replace_month_with_number, parse_date
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse, urljoin
 from db_utils import add_news_to_db
 import idna
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
 import time
 import random
 
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager  # Импорт webdriver-manager для Chrome
-from selenium.webdriver.chrome.options import Options
-
-# Функция для настройки драйвера
-def setup_driver():
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")  # Добавить опцию headless, если нужно
-    chrome_options.add_argument("--no-sandbox")  # Полезно для контейнеров
-
-    # Используем ChromeDriverManager для управления драйвером
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
-    return driver
 
 
-# Основной код для работы с Selenium
-def scrape_website(url):
-    driver = setup_driver()  # Инициализируем драйвер через setup_driver
-    try:
-        driver.get(url)
-        print(f"Title of the page is: {driver.title}")
-        # Ваш код для скрапинга здесь
-    finally:
-        driver.quit()
 
 def random_delay():
     time.sleep(random.uniform(1, 3))
 
 
 def get_html(url):
-    # Путь к chromedriver (замените на ваш путь к драйверу)
-    #chromedriver_path = '/path/to/chromedriver'
-    chromedriver_path = '/usr/local/bin/chromedriver'
+    """
+    Получает HTML содержимое страницы по указанному URL.
 
-    # Настройки браузера
-    chrome_options = Options()
-    chrome_options.add_argument('--headless')  # Без графического интерфейса
-    chrome_options.add_argument('--disable-blink-features=AutomationControlled')  # Отключение автоматизации
-    chrome_options.add_argument(
-        'user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36')  # Реалистичный user-agent
-    chrome_options.add_argument('--disable-infobars')
-    chrome_options.add_argument('--disable-extensions')
-    chrome_options.add_argument('--disable-popup-blocking')
-
-    # Инициализация драйвера
-    service = Service(chromedriver_path)
-    driver = webdriver.Chrome(service=service, options=chrome_options)
-
+    :param url: Ссылка на страницу
+    :return: Словарь с параметрами status и html
+    """
     try:
-        # Удаляем флаг navigator.webdriver
-        driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+        # Отправляем запрос на указанный URL
+        response = requests.get(url, timeout=10)
+        # Проверяем успешность запроса (статус-код 200)
+        response.raise_for_status()
+        # Возвращаем успешный статус и HTML содержимое
+        return {"status": True, "html": response.text}
+    except RequestException as e:
+        # Возвращаем статус false и сообщение об ошибке, если запрос не удался
+        return {"status": False, "html": f"An error occurred: {e}"}
 
-        # Открытие страницы по URL
-        driver.get(url)
-
-        # Добавляем случайную задержку перед получением HTML
-        random_delay()
-
-        # Получение HTML-кода страницы
-        html = driver.page_source
-    finally:
-        # Закрытие браузера
-        driver.quit()
-
-    return html
 
 
 def parse_news_tyumen_oblast(html):
