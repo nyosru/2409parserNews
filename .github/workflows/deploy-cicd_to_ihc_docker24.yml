@@ -52,8 +52,7 @@ jobs:
           script: |
             cd /home/docker
             docker-compose rm -f web_scraper2
-            docker-compose up -d --force-recreate ${{ env.CONTAINER }}
-            #docker-compose up -d 
+            docker-compose up -d --build --force-recreate ${{ env.CONTAINER }}
 
 #            docker-compose up -d --force-recreate ${{ env.CONTAINER }}
 #            docker-compose up -d
