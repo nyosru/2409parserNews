@@ -15,12 +15,30 @@ def parse_vsluh_news(html):
     post_text = soup.select_one('.post__text')
     post_text_html = add_target_blank(str(post_text)) if post_text else None
 
-    # Извлекаем название категории
-    category = soup.select_one('.post__category')
-    category_name = category.text.strip() if category else None
 
-    # Извлекаем ссылку на категорию новости
-    category_link = category['href'] if category and 'href' in category.attrs else None
+
+    # # Извлекаем название категории
+    # category = soup.select_one('.post__category')
+    # category_name = category.text.strip() if category else None
+    #
+    # # Извлекаем ссылку на категорию новости
+    # category_link = category['href'] if category and 'href' in category.attrs else None
+
+    # Находим последний элемент с классом 'bread__item'
+    last_bread_item = soup.select_one('.bread__item:last-of-type')
+
+    if last_bread_item:
+        # Получаем ссылку и текст
+        category_link = last_bread_item.a['href']
+        category_name = last_bread_item.a.text
+
+        # print("Категория:", category_name)
+        # print("Ссылка на категорию:", category_link)
+    else:
+        # print("Категория не найдена.")
+        category_link = None
+        category_name = None
+
 
     # Извлекаем дату публикации
     date_published = soup.select_one('.post__date')
