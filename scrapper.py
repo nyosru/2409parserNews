@@ -6,23 +6,18 @@ from bs4 import BeautifulSoup
 from urllib.parse import urlparse, urljoin
 import idna
 import time
-import random
-
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
-# import time
 
 import chardet
 
+
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
+import random
 
 
 def hide_selenium(driver):
@@ -53,6 +48,11 @@ def hide_selenium(driver):
     """)
 
 
+def hide_selenium(driver):
+    """Скрывает использование Selenium, подменяя некоторые атрибуты"""
+    driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+    driver.execute_script("window.navigator.chrome = {runtime: {}};")
+
 def get_html2(url):
     """Получение HTML с помощью Selenium с ожиданием выполнения JavaScript и скрытием Selenium"""
 
@@ -62,8 +62,13 @@ def get_html2(url):
     chrome_options.add_argument("--disable-dev-shm-usage")
 
     # Добавляем кастомный user-agent
-    chrome_options.add_argument(
-        "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36")
+    user_agents = [
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+        "Mozilla/5.0 (Linux; Android 10; SM-G960F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Mobile Safari/537.36"
+    ]
+    chrome_options.add_argument(f"user-agent={random.choice(user_agents)}")  # Случайный user-agent
 
     # Установка драйвера
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
