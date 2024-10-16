@@ -119,16 +119,12 @@ def scrape():
 def get_html_app():
     url = request.args.get('url')
     result = get_html(url)
+    return jsonify(result)
 
-    # if result["status"]:
-    #     print("HTML страницы получен успешно")
-    # else:
-    #     print(f"Ошибка: {result['html']}")
-    #
-    # result = {
-    #     "url": url,
-    #     "html": html
-    # }
+@app.route('/parse_news_full', methods=['GET'])
+def parse_news_full():
+    url = request.args.get('url')
+    result = scrape_website(url)
     return jsonify(result)
 
 

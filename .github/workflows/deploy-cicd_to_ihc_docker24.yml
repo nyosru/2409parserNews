@@ -50,9 +50,9 @@ jobs:
           username: ${{ env.VPS_USERNAME }}
           key: ${{ secrets.DEPLOY_KEY }}
           script: |
-            cd /home/docker
-            docker-compose rm -f web_scraper2
-            docker-compose up -d --build --force-recreate ${{ env.CONTAINER }}
+            cd ${{ env.DIR }}
+            docker-compose down --rmi all --volumes
+            docker-compose up -d --build
 
 #            docker-compose up -d --force-recreate ${{ env.CONTAINER }}
 #            docker-compose up -d
