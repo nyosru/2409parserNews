@@ -3,6 +3,7 @@ from urllib.parse import urlparse
 from scrapper import parse_news_tyumen_oblast, parse_news, scrape_website, parse_news_article, parse_catalogs, get_html
 import requests
 from vsluh_parser import parse_vsluh_news  # Импортируйте вашу функцию парсинга
+import json
 
 # from selenium import webdriver
 # from selenium.webdriver.chrome.options import Options
