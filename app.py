@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from urllib.parse import urlparse
 from scrapper import parse_news_tyumen_oblast, parse_news, scrape_website, parse_news_article, parse_catalogs, get_html
 import requests
+from vsluh_parser import parse_vsluh_news  # Импортируйте вашу функцию парсинга
 
 # from selenium import webdriver
 # from selenium.webdriver.chrome.options import Options
@@ -115,9 +116,28 @@ def scrape():
 
 
 
+# @app.route('/get_html', methods=['GET'])
+# def get_html_app():
+#     url = request.args.get('url')
+#     result = get_html(url)
+#     return jsonify(result)
+
 @app.route('/get_html', methods=['GET'])
 def get_html_app():
     url = request.args.get('url')
+    parse_type = request.args.get('type')  # Получаем тип парсинга
+
+    if parse_type == 'vsluh_item':
+        result = get_html(url)  # Используем функцию get_html для получения HTML
+        html = result.get('html')  # Извлекаем HTML из результата
+
+        if html:
+            parsed_data = parse_vsluh_news(html)  # Передаем HTML в вашу функцию
+            return jsonify(json.loads(parsed_data))  # Преобразуем JSON-строку обратно в объект
+        else:
+            return jsonify({"error": "HTML не был получен"}), 400
+
+    # Для других типов парсинга, например, используя функцию get_html
     result = get_html(url)
     return jsonify(result)
 
