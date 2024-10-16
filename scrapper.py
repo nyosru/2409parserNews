@@ -147,6 +147,17 @@ def get_html2_0726(url):
 def random_delay():
     time.sleep(random.uniform(1, 3))
 
+def add_target_blank(post_text_html):
+    # Создаем объект BeautifulSoup из HTML
+    soup = BeautifulSoup(post_text_html, 'html.parser')
+
+    # Находим все теги <a>
+    for link in soup.find_all('a'):
+        # Устанавливаем атрибут target="_blank"
+        link['target'] = '_blank'
+
+    # Возвращаем измененное HTML как строку
+    return str(soup)
 
 def get_html(url):
     """Получение HTML с помощью requests или Selenium"""

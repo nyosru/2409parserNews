@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 import json
+from scrapper import add_target_blank
 
 def parse_vsluh_news(html):
 
@@ -12,7 +13,7 @@ def parse_vsluh_news(html):
 
     # Извлекаем HTML из блока с классом post__text
     post_text = soup.select_one('.post__text')
-    post_text_html = str(post_text) if post_text else None
+    post_text_html = add_target_blank(str(post_text)) if post_text else None
 
     # Извлекаем название категории
     category = soup.select_one('.post__category')
