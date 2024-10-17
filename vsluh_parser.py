@@ -2,6 +2,51 @@ from bs4 import BeautifulSoup
 import json
 from scrapper import add_target_blank
 
+
+def parse_vsluh_news_list(html_content):
+
+    soup = BeautifulSoup(html_content, 'html.parser')
+    news_list = []
+
+    # Найти все элементы новостей
+    posts = soup.find_all('div', class_='post-list__item')
+
+    for post in posts:
+        # Получить заголовок новости
+        title_element = post.find('div', class_='post-list__name')
+        title = title_element.get_text(strip=True) if title_element else ''
+
+        # Получить ссылку на новость
+        link_element = post.find('a', class_='post-list__link')
+        link = link_element['href'] if link_element else ''
+
+        # Получить дату новости
+        date_element = post.find('div', class_='post-list__date')
+        date = date_element.get_text(strip=True) if date_element else ''
+
+        # Получить автора новости
+        author_element = post.find('div', class_='post-list__author')
+        author = author_element.get_text(strip=True) if author_element else ''
+
+        # Получить анонс новости
+        anons_element = post.find('div', class_='post-list__anons')
+        anons = anons_element.get_text(strip=True) if anons_element else ''
+
+        # Собрать данные в словарь
+        news_item = {
+            'title': title,
+            'link': link,
+            'date': date,
+            'author': author,
+            'anons': anons,
+        }
+
+        news_list.append(news_item)
+
+    # Возвращаем JSON-данные
+    return json.dumps(news_list, ensure_ascii=False)
+
+
 def parse_vsluh_news(html):
 
     # Парсим HTML с помощью BeautifulSoup
