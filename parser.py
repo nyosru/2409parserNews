@@ -69,6 +69,10 @@ def parse_tmo_news_list(html_content):
         title_element = post.find('a', class_='section-video__title')
         title = title_element.get_text(strip=True) if title_element else ''
 
+        # Получить картинку
+        i = post.find('img')
+        img = title_element.get('src') if i else ''
+
         # Получить ссылку на новость
         link = title_element['href'] if title_element else ''
 
@@ -96,6 +100,7 @@ def parse_tmo_news_list(html_content):
             # 'anons': anons,
             'cat_link':cat_link,
             'cat_name':cat_name,
+            'img':img,
         }
 
         news_list.append(news_item)
