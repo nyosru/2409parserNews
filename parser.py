@@ -73,7 +73,8 @@ def parse_tmo_news_list(html_content):
         link = title_element['href'] if title_element else ''
 
         # Получить дату новости
-        date_element = post.find('time', class_='post-section-video__item--date')
+        #date_element = post.find('time', class_='post-section-video__item--date')
+        date_element = post.find('time')
         date1 = date_element.get('datetime') if date_element else ''
         date = date_element.get_text(strip=True) if date_element else ''
 
