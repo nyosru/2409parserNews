@@ -71,7 +71,7 @@ def parse_tmo_news_list(html_content):
 
         # Получить картинку
         i = post.find('img')
-        img = title_element.get('src') if i else ''
+        img = i.get('src') if i else ''
 
         # Получить ссылку на новость
         link = title_element['href'] if title_element else ''
