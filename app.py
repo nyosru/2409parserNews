@@ -44,7 +44,7 @@ def get_html_app():
         result = get_html(url)  # Используем функцию get_html для получения HTML
         html = result.get('html')  # Извлекаем HTML из результата
         # Вызываем соответствующую функцию парсинга
-        parsed_data = parser_function(html,url)
+        parsed_data = parser_function(html)
         return jsonify(json.loads(parsed_data))  # Преобразуем JSON-строку обратно в объект
     else:
         # Если тип не указан или нет соответствующей функции, возвращаем HTML
