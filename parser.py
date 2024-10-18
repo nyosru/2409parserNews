@@ -5,18 +5,18 @@ import json
 from scrapper import add_target_blank
 
 
-
-def parse_news_list(html_content,url):
+# поиск в ТюменскаяОбласть.рф
+def parse_tmo_news_list(html_content):
 
     # url = request.args.get('url')
     # return jsonify({'url':url})
-    return json.dumps({'url':url}, ensure_ascii=False, indent=4)
+    #return json.dumps({'url':url}, ensure_ascii=False, indent=4)
 
     soup = BeautifulSoup(html_content, 'html.parser')
     news_list = []
 
     # Найти все элементы новостей
-    posts = soup.find_all('div', class_='post-list__item')
+    posts = soup.find_all('div', class_='section-video__item')
 
     # def parse_news_72_ru(html):
     #     """Парсит новости из HTML-страницы для домена тюменскаяобласть.рф"""
@@ -59,33 +59,40 @@ def parse_news_list(html_content,url):
 
 
     for post in posts:
+
+        # Получить каталог новости
+        cat = post.find('a', class_='section-video__category')
+        cat_link = cat['href'] if cat else ''
+        cat_name = cat.get_text(strip=True) if cat else ''
+
         # Получить заголовок новости
-        title_element = post.find('div', class_='post-list__name')
+        title_element = post.find('div', class_='section-video__title')
         title = title_element.get_text(strip=True) if title_element else ''
 
         # Получить ссылку на новость
-        link_element = post.find('a', class_='post-list__link')
-        link = link_element['href'] if link_element else ''
+        link = title_element['href'] if title_element else ''
 
         # Получить дату новости
-        date_element = post.find('div', class_='post-list__date')
-        date = date_element.get_text(strip=True) if date_element else ''
+        date_element = post.find('div', class_='post-section-video__item--date')
+        date = date_element['datetime'] if date_element else ''
 
-        # Получить автора новости
-        author_element = post.find('div', class_='post-list__author')
-        author = author_element.get_text(strip=True) if author_element else ''
-
-        # Получить анонс новости
-        anons_element = post.find('div', class_='post-list__anons')
-        anons = anons_element.get_text(strip=True) if anons_element else ''
+        # # Получить автора новости
+        # author_element = post.find('div', class_='post-list__author')
+        # author = author_element.get_text(strip=True) if author_element else ''
+        #
+        # # Получить анонс новости
+        # anons_element = post.find('div', class_='post-list__anons')
+        # anons = anons_element.get_text(strip=True) if anons_element else ''
 
         # Собрать данные в словарь
         news_item = {
             'title': title,
             'link': link,
             'date': date,
-            'author': author,
-            'anons': anons,
+            # 'author': author,
+            # 'anons': anons,
+            'cat_link':cat_link,
+            'cat_name':cat_name,
         }
 
         news_list.append(news_item)
