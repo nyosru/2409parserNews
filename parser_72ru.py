@@ -83,6 +83,8 @@ def parse_72ru_news_list(html_content):
 
         news_list.append(news_item)
 
+    news_list.append(html_content)
+
     # Возвращаем JSON-данные
     return json.dumps(news_list, ensure_ascii=False)
 
