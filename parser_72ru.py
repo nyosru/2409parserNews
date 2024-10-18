@@ -9,7 +9,24 @@ def parse_72ru_news_list(html_content):
     news_list = []
 
     # Найти все элементы новостей
-    posts = soup.find_all('div', class_='post-list__item')
+    block0 = soup.find('div', class_='gridContainer')
+
+    # Найти блоки с классами gridContainer и gridFullMobile
+    grid_containers = block0.find_all(class_=['gridFullMobile'])
+
+    # Получить второй блок с классом gridFullMobile, если он существует
+    grid_full_mobile_blocks = [block for block in grid_containers if 'gridFullMobile' in block['class']]
+
+    if len(grid_full_mobile_blocks) >= 2:
+        second_grid_full_mobile = grid_full_mobile_blocks[1]
+        # Обработка второго блока
+        news_list.append({'msg':'нашли второй блок','data':second_grid_full_mobile})
+    else:
+        second_grid_full_mobile = None  # Если второго блока нет
+        news_list.append({'msg':'НЕ нашли второй блок'})
+
+
+    return json.dumps(news_list, ensure_ascii=False)
 
     # def parse_news_72_ru(html):
     #     """Парсит новости из HTML-страницы для домена тюменскаяобласть.рф"""
