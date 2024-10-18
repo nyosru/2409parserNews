@@ -66,14 +66,14 @@ def parse_tmo_news_list(html_content):
         cat_name = cat.get_text(strip=True) if cat else ''
 
         # Получить заголовок новости
-        title_element = post.find('div', class_='section-video__title')
+        title_element = post.find('a', class_='section-video__title')
         title = title_element.get_text(strip=True) if title_element else ''
 
         # Получить ссылку на новость
         link = title_element['href'] if title_element else ''
 
         # Получить дату новости
-        date_element = post.find('div', class_='post-section-video__item--date')
+        date_element = post.find('time', class_='post-section-video__item--date')
         date = date_element['datetime'] if date_element else ''
 
         # # Получить автора новости
