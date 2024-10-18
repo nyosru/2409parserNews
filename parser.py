@@ -6,9 +6,9 @@ from scrapper import add_target_blank
 
 
 
-def parse_news_list(html_content):
+def parse_news_list(html_content,url):
 
-    url = request.args.get('url')
+    # url = request.args.get('url')
     return jsonify({'url':url})
 
     soup = BeautifulSoup(html_content, 'html.parser')

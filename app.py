@@ -29,6 +29,32 @@ def index():
     return jsonify({'status': 'ok'})
 
 
+
+@app.route('/get_html', methods=['GET'])
+def get_html_app():
+    url = request.args.get('url')
+    parse_type = request.args.get('type')  # Получаем тип парсинга
+
+
+    if html:
+        # Проверяем, существует ли функция для переданного типа парсинга
+        parser_function = PARSER_FUNCTIONS.get(parse_type)
+
+        if parser_function:
+            result = get_html(url)  # Используем функцию get_html для получения HTML
+            html = result.get('html')  # Извлекаем HTML из результата
+            # Вызываем соответствующую функцию парсинга
+            parsed_data = parser_function(html,url)
+            return jsonify(json.loads(parsed_data))  # Преобразуем JSON-строку обратно в объект
+        else:
+            # Если тип не указан или нет соответствующей функции, возвращаем HTML
+            return jsonify({'html': html})
+
+    else:
+        return jsonify({"error": "HTML не был получен"}), 400
+
+
+
 # @app.route('/check_db', methods=['GET', 'POST'])
 # def check_db():
 #     """Проверяет подключение к базе данных"""
@@ -134,29 +160,6 @@ def scrape():
 #     url = request.args.get('url')
 #     result = get_html(url)
 #     return jsonify(result)
-
-@app.route('/get_html', methods=['GET'])
-def get_html_app():
-    url = request.args.get('url')
-    parse_type = request.args.get('type')  # Получаем тип парсинга
-
-    result = get_html(url)  # Используем функцию get_html для получения HTML
-    html = result.get('html')  # Извлекаем HTML из результата
-
-    if html:
-        # Проверяем, существует ли функция для переданного типа парсинга
-        parser_function = PARSER_FUNCTIONS.get(parse_type)
-
-        if parser_function:
-            # Вызываем соответствующую функцию парсинга
-            parsed_data = parser_function(html)
-            return jsonify(json.loads(parsed_data))  # Преобразуем JSON-строку обратно в объект
-        else:
-            # Если тип не указан или нет соответствующей функции, возвращаем HTML
-            return jsonify({'html': html})
-
-    else:
-        return jsonify({"error": "HTML не был получен"}), 400
 
 @app.route('/parse_news_full', methods=['GET'])
 def parse_news_full():
