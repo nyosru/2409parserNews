@@ -1,5 +1,5 @@
 
-from flask import request, jsonify
+from flask import jsonify
 from bs4 import BeautifulSoup
 import json
 from scrapper import add_target_blank
@@ -9,7 +9,8 @@ from scrapper import add_target_blank
 def parse_news_list(html_content,url):
 
     # url = request.args.get('url')
-    return jsonify({'url':url})
+    # return jsonify({'url':url})
+    return json.dumps({'url':url}, ensure_ascii=False, indent=4)
 
     soup = BeautifulSoup(html_content, 'html.parser')
     news_list = []

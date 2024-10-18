@@ -13,7 +13,8 @@ PARSER_FUNCTIONS = {
     'parse_vsluh_news_list': parse_vsluh_news_list,
     'parse_vsluh_news': parse_vsluh_news,
     # Добавьте другие типы парсинга, если нужно
-    'parse_news_list': parse_news_list,
+    #'parse_news_list': parse_news_list,
+    'parse_72ru_news_list': parse_72ru_news_list,
 }
 
 
@@ -32,6 +33,7 @@ def index():
 
 @app.route('/get_html', methods=['GET'])
 def get_html_app():
+
     url = request.args.get('url')
     parse_type = request.args.get('type')  # Получаем тип парсинга
 
@@ -43,7 +45,7 @@ def get_html_app():
         html = result.get('html')  # Извлекаем HTML из результата
         # Вызываем соответствующую функцию парсинга
         parsed_data = parser_function(html,url)
-        return jsonify({'parsed_data':parsed_data,'datain':json.loads(parsed_data)})  # Преобразуем JSON-строку обратно в объект
+        return jsonify(json.loads(parsed_data))  # Преобразуем JSON-строку обратно в объект
     else:
         # Если тип не указан или нет соответствующей функции, возвращаем HTML
         return jsonify({'error': 'no_function'})
