@@ -74,7 +74,8 @@ def parse_tmo_news_list(html_content):
 
         # Получить дату новости
         date_element = post.find('time', class_='post-section-video__item--date')
-        date = date_element['datetime'] if date_element else ''
+        date1 = date_element.get('datetime') if date_element else ''
+        date = date_element.get_text(strip=True) if date_element else ''
 
         # # Получить автора новости
         # author_element = post.find('div', class_='post-list__author')
@@ -89,6 +90,7 @@ def parse_tmo_news_list(html_content):
             'title': title,
             'link': link,
             'date': date,
+            'date_origin': date1,
             # 'author': author,
             # 'anons': anons,
             'cat_link':cat_link,
