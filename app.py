@@ -35,23 +35,19 @@ def get_html_app():
     url = request.args.get('url')
     parse_type = request.args.get('type')  # Получаем тип парсинга
 
+    # Проверяем, существует ли функция для переданного типа парсинга
+    parser_function = PARSER_FUNCTIONS.get(parse_type)
 
-    if html:
-        # Проверяем, существует ли функция для переданного типа парсинга
-        parser_function = PARSER_FUNCTIONS.get(parse_type)
-
-        if parser_function:
-            result = get_html(url)  # Используем функцию get_html для получения HTML
-            html = result.get('html')  # Извлекаем HTML из результата
-            # Вызываем соответствующую функцию парсинга
-            parsed_data = parser_function(html,url)
-            return jsonify(json.loads(parsed_data))  # Преобразуем JSON-строку обратно в объект
-        else:
-            # Если тип не указан или нет соответствующей функции, возвращаем HTML
-            return jsonify({'html': html})
-
+    if parser_function:
+        result = get_html(url)  # Используем функцию get_html для получения HTML
+        html = result.get('html')  # Извлекаем HTML из результата
+        # Вызываем соответствующую функцию парсинга
+        parsed_data = parser_function(html,url)
+        return jsonify(json.loads(parsed_data))  # Преобразуем JSON-строку обратно в объект
     else:
-        return jsonify({"error": "HTML не был получен"}), 400
+        # Если тип не указан или нет соответствующей функции, возвращаем HTML
+        return jsonify({'error': 'no_function'})
+
 
 
 
