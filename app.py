@@ -43,7 +43,7 @@ def get_html_app():
         html = result.get('html')  # Извлекаем HTML из результата
         # Вызываем соответствующую функцию парсинга
         parsed_data = parser_function(html,url)
-        return jsonify(json.loads(parsed_data))  # Преобразуем JSON-строку обратно в объект
+        return jsonify({'parsed_data':parsed_data,'datain':json.loads(parsed_data)})  # Преобразуем JSON-строку обратно в объект
     else:
         # Если тип не указан или нет соответствующей функции, возвращаем HTML
         return jsonify({'error': 'no_function'})
