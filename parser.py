@@ -98,8 +98,8 @@ def parse_tmo_news_list(html_content):
             'date_origin': date1,
             # 'author': author,
             # 'anons': anons,
-            'cat_link':cat_link,
-            'cat_name':cat_name,
+            'catalog_link':cat_link,
+            'catalog_name':cat_name,
             'img':img,
         }
 
