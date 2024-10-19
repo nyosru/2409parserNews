@@ -202,25 +202,34 @@ def parse_tmo_news(html):
 
 
 
+from datetime import datetime
+from bs4 import BeautifulSoup
+import json
 
 def parse_ura_news(html):
     soup = BeautifulSoup(html, 'html.parser')
 
     # Заголовок новости
-    title = soup.find('h1', class_='publication-title').get_text(strip=True)
+    title_tag = soup.find('h1', class_='publication-title')
+    title = title_tag.get_text(strip=True) if title_tag else "Заголовок не найден"
 
     # Дата публикации
-    date_published_raw = soup.find('time', itemprop='datePublished').get_text(strip=True)
+    date_published_tag = soup.find('time', itemprop='datePublished')
+    date_published_raw = date_published_tag.get_text(strip=True) if date_published_tag else None
 
     # Преобразование даты к формату 'YYYY-MM-DD HH:MM:SS'
-    try:
-        date_published = datetime.strptime(date_published_raw, '%d %B %Y, %H:%M')
-        date_published = date_published.strftime('%Y-%m-%d %H:%M:%S')
-    except ValueError:
-        date_published = None  # На случай, если формат даты не распознан
+    if date_published_raw:
+        try:
+            date_published = datetime.strptime(date_published_raw, '%d %B %Y, %H:%M')
+            date_published = date_published.strftime('%Y-%m-%d %H:%M:%S')
+        except ValueError:
+            date_published = None  # На случай, если формат даты не распознан
+    else:
+        date_published = None
 
     # Автор новости
-    author = soup.find('div', class_='author-name').get_text(strip=True)
+    author_tag = soup.find('div', class_='author-name')
+    author = author_tag.get_text(strip=True) if author_tag else "Автор не указан"
 
     # Тело статьи
     article_body = soup.find('div', itemprop='articleBody')
@@ -237,8 +246,9 @@ def parse_ura_news(html):
 
     # Изображение с описанием
     image_block = soup.find('div', class_='item-img-block')
-    image_url = image_block.find('img')['src']
-    image_description = image_block.find('span', itemprop='description').get_text(strip=True)
+    image_url = image_block.find('img')['src'] if image_block and image_block.find('img') else None
+    image_description_tag = image_block.find('span', itemprop='description') if image_block else None
+    image_description = image_description_tag.get_text(strip=True) if image_description_tag else None
 
     # Собираем результат
     news_data = {
