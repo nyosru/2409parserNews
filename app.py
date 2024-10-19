@@ -15,6 +15,7 @@ PARSER_FUNCTIONS = {
     'parse_vsluh_news': parse_vsluh_news,
     # Добавьте другие типы парсинга, если нужно
     #'parse_news_list': parse_news_list,
+
     'parse_72ru_news_list': parse_72ru_news_list,
     'parse_tmo_news_list': parse_tmo_news_list,
     'parse_tmo_news': parse_tmo_news,
