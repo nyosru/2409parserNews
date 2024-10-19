@@ -198,6 +198,43 @@ def parse_tmo_news(html):
 
     return json.dumps(result, ensure_ascii=False, indent=4)
 
+
+def parse_ura_news(html):
+    soup0 = BeautifulSoup(html, 'html.parser')
+    soup = soup0.find('div', class_='vc-publication-container')
+
+    # Заголовок новости
+    title = soup.find('h1', class_='publication-title').get_text(strip=True)
+
+    # Дата публикации
+    date_published = soup.find('time', itemprop='datePublished').get_text(strip=True)
+
+    # Автор новости
+    author = soup.find('div', class_='author-name').get_text(strip=True)
+
+    # Тело статьи
+    article_body = soup.find('div', itemprop='articleBody')
+    paragraphs = article_body.find_all('p')
+    body = '\n'.join([p.get_text(strip=True) for p in paragraphs])
+
+    # Изображение с описанием
+    image_block = soup.find('div', class_='item-img-block')
+    image_url = image_block.find('img')['src']
+    image_description = image_block.find('span', itemprop='description').get_text(strip=True)
+
+    # Собираем результат
+    news_data = {
+        'title': title,
+        'date_published': date_published,
+        'author': author,
+        'body': body,
+        'image_url': image_url,
+        'image_description': image_description
+    }
+
+    return news_data
+
+
 # Пример использования
 if __name__ == "__main__":
     url = "https://72.ru/text"  # Замените на нужный URL
