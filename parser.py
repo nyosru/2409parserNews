@@ -125,9 +125,7 @@ def parse_ura_news_list(html_content):
         # Получить время новости
         time_element = post.find('span', class_='time')
         time = time_element.get_text(strip=True) if time_element else ''
-
-        for span in link_element.find_all('span'):
-            span.decompose()
+        time_element.decompose()
 
         # Получить заголовок новости
         title = link_element.get_text(strip=True) if link_element else ''
