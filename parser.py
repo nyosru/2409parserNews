@@ -198,7 +198,6 @@ def parse_tmo_news(html):
 
     return json.dumps(result, ensure_ascii=False, indent=4)
 
-
 def parse_ura_news(html):
     soup0 = BeautifulSoup(html, 'html.parser')
     soup = soup0.find('div', class_='vc-publication-container')

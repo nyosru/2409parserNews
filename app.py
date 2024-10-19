@@ -54,7 +54,7 @@ def get_html_app():
         return jsonify(json.loads(parsed_data))  # Преобразуем JSON-строку обратно в объект
     else:
         # Если тип не указан или нет соответствующей функции, возвращаем HTML
-        return jsonify({'error': 'no_function'})
+        return jsonify({'error': 'no_function', 'parse_type':parse_type})
 
 
 
