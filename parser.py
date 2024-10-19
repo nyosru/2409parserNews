@@ -219,7 +219,7 @@ def parse_ura_news(html):
     #body = article_body.get_text(strip=True)
     text_html = add_target_blank(str(article_body)) if article_body else None
     paragraphs = text_html.find_all('p', recursive=False)
-
+    text_html2 = add_target_blank(str(paragraphs)) if paragraphs else None
 
     # Изображение с описанием
     image_block = soup.find('div', class_='item-img-block')
@@ -231,7 +231,7 @@ def parse_ura_news(html):
         'title': title,
         'date_published': date_published,
         'author': author,
-        'text_html': paragraphs,
+        'text_html': text_html2,
         'image_url': image_url,
         'image_description': image_description
     }
