@@ -122,12 +122,15 @@ def parse_ura_news_list(html_content):
         link_element = post.find('a')
         link = link_element['href'] if link_element else ''
 
-        # Получить заголовок новости
-        title = link_element.get_text(strip=True) if link_element else ''
-
         # Получить время новости
         time_element = post.find('span', class_='time')
         time = time_element.get_text(strip=True) if time_element else ''
+
+        for span in link_element.find_all('span'):
+            span.decompose()
+
+        # Получить заголовок новости
+        title = link_element.get_text(strip=True) if link_element else ''
 
         # Получить дату новости из родительского контейнера
         date_element = post.find_parent('div', class_='list-scroll-container').find_previous_sibling('div', class_='list-scroll-date')
