@@ -198,9 +198,9 @@ def parse_tmo_news(html):
 
     return json.dumps(result, ensure_ascii=False, indent=4)
 
+
 def parse_ura_news(html):
     soup = BeautifulSoup(html, 'html.parser')
-    #soup = soup0.find('div', class_='vc-publication-container')
 
     # Заголовок новости
     title = soup.find('h1', class_='publication-title').get_text(strip=True)
@@ -212,14 +212,17 @@ def parse_ura_news(html):
     author = soup.find('div', class_='author-name').get_text(strip=True)
 
     # Тело статьи
-    #article_body = soup.find('div', itemprop='articleBody')
     article_body = soup.find('div', itemprop='articleBody')
-    #paragraphs = article_body.find_all('p')
-    #body = '\n'.join([p.get_text(strip=True) for p in paragraphs])
-    #body = article_body.get_text(strip=True)
+
+    # Извлекаем только те <p>, которые непосредственно являются детьми articleBody (без вложенных элементов)
+    if article_body:
+        paragraphs = [p.get_text(strip=True) for p in article_body.find_all('p', recursive=False)]
+        body = '\n'.join(paragraphs)
+    else:
+        body = None
+
+    # Добавляем атрибут target="_blank" в ссылки
     text_html = add_target_blank(str(article_body)) if article_body else None
-    paragraphs = text_html.find_all('p', recursive=False)
-    text_html2 = add_target_blank(str(paragraphs)) if paragraphs else None
 
     # Изображение с описанием
     image_block = soup.find('div', class_='item-img-block')
@@ -231,13 +234,13 @@ def parse_ura_news(html):
         'title': title,
         'date_published': date_published,
         'author': author,
-        'text_html': text_html2,
+        'text_html': text_html,
+        'body': body,
         'image_url': image_url,
         'image_description': image_description
     }
 
     return json.dumps(news_data, ensure_ascii=False, indent=4)
-    #return news_data
 
 
 # Пример использования
