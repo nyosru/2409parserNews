@@ -3,6 +3,8 @@ from bs4 import BeautifulSoup
 import json
 from scrapper import add_target_blank
 
+from datetime import datetime
+
 
 # поиск в ТюменскаяОбласть.рф
 def parse_tmo_news_list(html_content):
@@ -198,6 +200,9 @@ def parse_tmo_news(html):
 
     return json.dumps(result, ensure_ascii=False, indent=4)
 
+
+
+
 def parse_ura_news(html):
     soup = BeautifulSoup(html, 'html.parser')
 
@@ -205,7 +210,14 @@ def parse_ura_news(html):
     title = soup.find('h1', class_='publication-title').get_text(strip=True)
 
     # Дата публикации
-    date_published = soup.find('time', itemprop='datePublished').get_text(strip=True)
+    date_published_raw = soup.find('time', itemprop='datePublished').get_text(strip=True)
+
+    # Преобразование даты к формату 'YYYY-MM-DD HH:MM:SS'
+    try:
+        date_published = datetime.strptime(date_published_raw, '%d %B %Y, %H:%M')
+        date_published = date_published.strftime('%Y-%m-%d %H:%M:%S')
+    except ValueError:
+        date_published = None  # На случай, если формат даты не распознан
 
     # Автор новости
     author = soup.find('div', class_='author-name').get_text(strip=True)
@@ -239,6 +251,7 @@ def parse_ura_news(html):
     }
 
     return json.dumps(news_data, ensure_ascii=False, indent=4)
+
 
 
 # Пример использования
