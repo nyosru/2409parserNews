@@ -108,56 +108,47 @@ def parse_tmo_news_list(html_content):
     # Возвращаем JSON-данные
     return json.dumps(news_list, ensure_ascii=False)
 
+from bs4 import BeautifulSoup
+import json
+from scrapper import add_target_blank
 
-def parse_72ru_news(html):
+
+def parse_tmo_news(html):
 
     # Парсим HTML с помощью BeautifulSoup
     soup = BeautifulSoup(html, 'html.parser')
 
-    # Извлекаем первую картинку
-    first_image = soup.select_one('.swiper-link img')
-    first_image_url = first_image['src'] if first_image else None
-
-    # Извлекаем HTML из блока с классом post__text
-    post_text = soup.select_one('.post__text')
-    post_text_html = add_target_blank(str(post_text)) if post_text else None
-
-
-
-    # # Извлекаем название категории
-    # category = soup.select_one('.post__category')
-    # category_name = category.text.strip() if category else None
-    #
-    # # Извлекаем ссылку на категорию новости
-    # category_link = category['href'] if category and 'href' in category.attrs else None
-
-    # Находим последний элемент с классом 'bread__item'
-    last_bread_item = soup.select_one('.bread__item:last-of-type')
-
-    if last_bread_item:
-        # Получаем ссылку и текст
-        category_link = last_bread_item.a['href']
-        category_name = last_bread_item.a.text
-
-        # print("Категория:", category_name)
-        # print("Ссылка на категорию:", category_link)
-    else:
-        # print("Категория не найдена.")
-        category_link = None
-        category_name = None
-
+    # Извлекаем заголовок новости
+    title_element = soup.select_one('.detail-card__header h1')
+    title = title_element.get_text(strip=True) if title_element else None
 
     # Извлекаем дату публикации
-    date_published = soup.select_one('.post__date')
-    date_published_text = date_published.text.strip() if date_published else None
+    date_element = soup.select_one('.detail-card__header time')
+    date = date_element.get_text(strip=True) if date_element else None
+    date_origin = date_element.get('datetime') if date_element else None
 
-    # Формируем итоговый JSON
+    # Извлекаем ссылку на категорию
+    category_element = soup.select_one('.detail-card__header a')
+    category_name = category_element.get_text(strip=True) if category_element else None
+    category_link = category_element.get('href') if category_element else None
+
+    # Извлекаем изображение
+    image_element = soup.select_one('.detail-card__image img')
+    image_url = image_element.get('src') if image_element else None
+
+    # Извлекаем текст статьи
+    text_element = soup.select_one('.detail-card__text')
+    text_html = add_target_blank(str(text_element)) if text_element else None
+
+    # Формируем итоговый JSON с нужными полями
     result = {
-        "first_image": first_image_url,
-        "post_text_html": post_text_html,
+        "title": title,
+        "date": date,
+        "date_origin": date_origin,
         "category_name": category_name,
         "category_link": category_link,
-        "date_published": date_published_text
+        "image_url": image_url,
+        "text_html": text_html
     }
 
     return json.dumps(result, ensure_ascii=False, indent=4)
