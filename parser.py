@@ -233,7 +233,8 @@ def parse_ura_news(html):
         'image_description': image_description
     }
 
-    return news_data
+    return json.dumps(news_data, ensure_ascii=False, indent=4)
+    #return news_data
 
 
 # Пример использования
