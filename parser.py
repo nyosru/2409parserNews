@@ -216,16 +216,16 @@ def parse_ura_news(html):
     # Дата публикации
     date_published_tag = soup.find('time', itemprop='datePublished')
     date_published_raw = date_published_tag.get_text(strip=True) if date_published_tag else None
-
+    date_published = date_published_raw
     # Преобразование даты к формату 'YYYY-MM-DD HH:MM:SS'
-    if date_published_raw:
-        try:
-            date_published = datetime.strptime(date_published_raw, '%d %B %Y, %H:%M')
-            date_published = date_published.strftime('%Y-%m-%d %H:%M:%S')
-        except ValueError:
-            date_published = None  # На случай, если формат даты не распознан
-    else:
-        date_published = None
+    # if date_published_raw:
+    #     try:
+    #         date_published = datetime.strptime(date_published_raw, '%d %B %Y, %H:%M')
+    #         date_published = date_published.strftime('%Y-%m-%d %H:%M:%S')
+    #     except ValueError:
+    #         date_published = None  # На случай, если формат даты не распознан
+    # else:
+    #     date_published = None
 
     # Автор новости
     author_tag = soup.find('div', class_='author-name')
