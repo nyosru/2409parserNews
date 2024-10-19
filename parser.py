@@ -109,6 +109,9 @@ def parse_tmo_news_list(html_content):
 
 #parse_ura_news_list
 # ura.news
+from bs4 import BeautifulSoup
+import json
+
 def parse_ura_news_list(html_content):
 
     soup = BeautifulSoup(html_content, 'html.parser')
@@ -125,10 +128,17 @@ def parse_ura_news_list(html_content):
         # Получить время новости
         time_element = post.find('span', class_='time')
         time = time_element.get_text(strip=True) if time_element else ''
-        time_element.decompose()
 
-        # Получить заголовок новости
-        title = link_element.get_text(strip=True) if link_element else ''
+        # Удалить <span> из заголовка
+        if link_element:
+            # Удаляем все <span> элементы внутри тега <a>
+            for span in link_element.find_all('span'):
+                span.decompose()
+
+            # Получаем текст заголовка без <span>
+            title = link_element.get_text(strip=True)
+        else:
+            title = ''
 
         # Получить дату новости из родительского контейнера
         date_element = post.find_parent('div', class_='list-scroll-container').find_previous_sibling('div', class_='list-scroll-date')
@@ -146,7 +156,6 @@ def parse_ura_news_list(html_content):
 
     # Возвращаем JSON-данные
     return json.dumps(news_list, ensure_ascii=False)
-
 
 
 def parse_tmo_news(html):
