@@ -3,8 +3,10 @@ from urllib.parse import urlparse
 from scrapper import parse_news_tyumen_oblast, parse_news, scrape_website, parse_news_article, parse_catalogs, get_html
 import requests
 from vsluh_parser import parse_vsluh_news, parse_vsluh_news_list  # Импортируйте вашу функцию парсинга
+
 from parser import parse_tmo_news_list, parse_tmo_news
 from parser import parse_ura_news_list, parse_ura_news  # Импортируйте вашу функцию парсинга
+
 from parser_72ru import parse_72ru_news, parse_72ru_news_list  # Импортируйте вашу функцию парсинга
 import json
 
@@ -51,7 +53,10 @@ def get_html_app():
         html = result.get('html')  # Извлекаем HTML из результата
         # Вызываем соответствующую функцию парсинга
         parsed_data = parser_function(html)
+        parsed_data.append(result)
+
         return jsonify(json.loads(parsed_data))  # Преобразуем JSON-строку обратно в объект
+
     else:
         # Если тип не указан или нет соответствующей функции, возвращаем HTML
         return jsonify({'error': 'no_function', 'parse_type':parse_type})
