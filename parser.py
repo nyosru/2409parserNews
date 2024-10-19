@@ -198,7 +198,6 @@ def parse_tmo_news(html):
 
     return json.dumps(result, ensure_ascii=False, indent=4)
 
-
 def parse_ura_news(html):
     soup = BeautifulSoup(html, 'html.parser')
 
@@ -214,15 +213,15 @@ def parse_ura_news(html):
     # Тело статьи
     article_body = soup.find('div', itemprop='articleBody')
 
-    # Извлекаем только те <p>, которые непосредственно являются детьми articleBody (без вложенных элементов)
+    # Извлекаем только <p> теги, которые являются дочерними элементами articleBody
     if article_body:
-        paragraphs = [p.get_text(strip=True) for p in article_body.find_all('p', recursive=False)]
-        body = '\n'.join(paragraphs)
+        paragraphs = article_body.find_all('p', recursive=False)
+        body_html = ''.join([str(p) for p in paragraphs])  # Сохраняем HTML с тегами <p>
     else:
-        body = None
+        body_html = None
 
     # Добавляем атрибут target="_blank" в ссылки
-    text_html = add_target_blank(str(article_body)) if article_body else None
+    text_html = add_target_blank(body_html) if body_html else None
 
     # Изображение с описанием
     image_block = soup.find('div', class_='item-img-block')
@@ -235,7 +234,6 @@ def parse_ura_news(html):
         'date_published': date_published,
         'author': author,
         'text_html': text_html,
-        'body': body,
         'image_url': image_url,
         'image_description': image_description
     }
