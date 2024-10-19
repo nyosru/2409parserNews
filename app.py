@@ -53,7 +53,6 @@ def get_html_app():
         html = result.get('html')  # Извлекаем HTML из результата
         # Вызываем соответствующую функцию парсинга
         parsed_data = parser_function(html)
-        parsed_data.append(result)
 
         return jsonify(json.loads(parsed_data))  # Преобразуем JSON-строку обратно в объект
 

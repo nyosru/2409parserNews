@@ -199,8 +199,8 @@ def parse_tmo_news(html):
     return json.dumps(result, ensure_ascii=False, indent=4)
 
 def parse_ura_news(html):
-    soup0 = BeautifulSoup(html, 'html.parser')
-    soup = soup0.find('div', class_='vc-publication-container')
+    soup = BeautifulSoup(html, 'html.parser')
+    #soup = soup0.find('div', class_='vc-publication-container')
 
     # Заголовок новости
     title = soup.find('h1', class_='publication-title').get_text(strip=True)
@@ -212,9 +212,11 @@ def parse_ura_news(html):
     author = soup.find('div', class_='author-name').get_text(strip=True)
 
     # Тело статьи
+    #article_body = soup.find('div', itemprop='articleBody')
     article_body = soup.find('div', itemprop='articleBody')
-    paragraphs = article_body.find_all('p')
-    body = '\n'.join([p.get_text(strip=True) for p in paragraphs])
+    #paragraphs = article_body.find_all('p')
+    #body = '\n'.join([p.get_text(strip=True) for p in paragraphs])
+    body = article_body.get_text(strip=True)
 
     # Изображение с описанием
     image_block = soup.find('div', class_='item-img-block')
